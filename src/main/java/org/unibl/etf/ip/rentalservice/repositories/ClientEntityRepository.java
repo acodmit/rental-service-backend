@@ -2,8 +2,11 @@ package org.unibl.etf.ip.rentalservice.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.unibl.etf.ip.rentalservice.model.dto.Client;
+import org.unibl.etf.ip.rentalservice.model.entities.ClientEntity;
 
-public interface ClientEntityRepository extends JpaRepository<Client, Integer> {
+import java.util.Optional;
+
+public interface ClientEntityRepository extends JpaRepository<ClientEntity, Integer> {
     // Find by ID card number
-    Client findByIdCardNumber(String idCardNumber);
+    Optional<ClientEntity> findByIdCardNumber(String idCardNumber);
 }

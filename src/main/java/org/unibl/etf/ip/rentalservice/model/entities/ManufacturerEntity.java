@@ -1,5 +1,6 @@
 package org.unibl.etf.ip.rentalservice.model.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.unibl.etf.ip.rentalservice.core.BaseEntity;
@@ -33,6 +34,7 @@ public class ManufacturerEntity implements BaseEntity<Integer> {
     @Column(name = "email", nullable = true, length = 100)
     private String email;
     @OneToMany(mappedBy = "manufacturer")
+    @JsonIgnore
     private List<VehicleEntity> vehicles;
 
 }

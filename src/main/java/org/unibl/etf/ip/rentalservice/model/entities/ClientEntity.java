@@ -1,29 +1,29 @@
 package org.unibl.etf.ip.rentalservice.model.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.unibl.etf.ip.rentalservice.core.BaseEntity;
 
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
 @Table(name = "client")
-public class ClientEntity implements BaseEntity<Integer> {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    @Column(name = "id", nullable = false)
-    private Integer id;
+@PrimaryKeyJoinColumn(name = "id")
+public class ClientEntity extends UserEntity{
     @Basic
     @Column(name = "avatar_url", nullable = true, length = 255)
     private String avatarUrl;
     @Basic
     @Column(name = "id_card_number", nullable = false, length = 20)
     private String idCardNumber;
-    @OneToOne
-    @JoinColumn(name = "client_id", referencedColumnName = "id", nullable = false)
-    private UserEntity user;
+    @Basic
+    @Column(name = "is_blocked", nullable = true)
+    private Boolean isBlocked;
     @OneToMany(mappedBy = "client")
+    @JsonIgnore
     private List<RentalEntity> rentals;
 
 }

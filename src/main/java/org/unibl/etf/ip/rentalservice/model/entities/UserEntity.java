@@ -1,14 +1,17 @@
 package org.unibl.etf.ip.rentalservice.model.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.unibl.etf.ip.rentalservice.core.BaseEntity;
+import org.unibl.etf.ip.rentalservice.model.enums.UserType;
 
 import java.util.List;
 
 @Data
 @Entity
 @Table(name = "user")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class UserEntity implements BaseEntity<Integer> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
@@ -32,11 +35,8 @@ public class UserEntity implements BaseEntity<Integer> {
     @Basic
     @Column(name = "phone_number", nullable = true, length = 50)
     private String phoneNumber;
-    @OneToOne(mappedBy = "user")
-    private ClientEntity client;
-    @OneToOne(mappedBy = "user")
-    private EmployeeEntity employee;
     @OneToMany(mappedBy = "user")
+    @JsonIgnore
     private List<LoginSessionEntity> loginSessions;
 
 }

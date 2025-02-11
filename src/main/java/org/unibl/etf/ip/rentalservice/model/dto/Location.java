@@ -9,7 +9,6 @@ public class Location {
     private Integer id;
     private BigDecimal latitude;
     private BigDecimal longitude;
-    private List<Rental> pickUpRentals;
-    private List<Rental> dropOffRentals;
-
+    //private List<Rental> pickUpRentals;
+    //private List<Rental> dropOffRentals;
 }

@@ -8,6 +8,6 @@ public class LoginSession {
     private Integer id;
     private Timestamp loginTime;
     private Timestamp logoutTime;
-    private User user;
+    //private User user;
 
 }

@@ -12,8 +12,5 @@ public class User {
     private String lastName;
     private String email;
     private String phoneNumber;
-    private Client client;
-    private Employee employee;
     private List<LoginSession> loginSessions;
-
 }

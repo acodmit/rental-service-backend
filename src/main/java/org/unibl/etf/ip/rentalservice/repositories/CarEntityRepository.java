@@ -12,5 +12,5 @@ import java.util.Optional;
 public interface CarEntityRepository extends JpaRepository<CarEntity, Integer> {
 
     // Find all cars by model
-    List<Car> findByModel(String model);
+    List<CarEntity> findByModel(String model);
 }

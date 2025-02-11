@@ -8,6 +8,5 @@ public class Fault {
     private Integer id;
     private String description;
     private Timestamp reportedDate;
-    private Vehicle vehicle;
-
+    //private Vehicle vehicle;
 }

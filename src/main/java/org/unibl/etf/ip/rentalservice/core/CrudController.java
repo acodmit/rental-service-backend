@@ -1,6 +1,7 @@
 package org.unibl.etf.ip.rentalservice.core;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.unibl.etf.ip.rentalservice.exceptions.NotFoundException;
 
@@ -9,44 +10,41 @@ import java.util.List;
 
 public abstract class CrudController<ID extends Serializable, REQ, RESP> {
 
-    private final Class<RESP> respClass;
+    private final Class<RESP> responseType;
     private final CrudService<ID> crudService;
 
-    // Constructor for initializing the controller with service and response class
-    protected CrudController(Class<RESP> respClass, CrudService<ID> crudService) {
-        this.respClass = respClass;
+    protected CrudController(Class<RESP> responseType, CrudService<ID> crudService) {
+        this.responseType = responseType;
         this.crudService = crudService;
     }
 
-    // Get all entities (responds with a list of response DTOs)
     @GetMapping
-    public List<RESP> findAll() {
-        return crudService.findAll(respClass);
+    public ResponseEntity<List<RESP>> findAll() {
+        List<RESP> responseList = crudService.findAll(responseType);
+        return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
 
-    // Get an entity by ID
     @GetMapping("/{id}")
-    public RESP findById(@PathVariable ID id) throws NotFoundException {
-        return crudService.findById(id, respClass);
+    public ResponseEntity<RESP> findById(@PathVariable ID id) throws NotFoundException {
+        RESP response = crudService.findById(id, responseType);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    // Delete an entity by ID
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable ID id) throws NotFoundException {
+    public ResponseEntity<Void> delete(@PathVariable ID id) throws NotFoundException {
         crudService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    // Insert a new entity
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public RESP insert(@RequestBody REQ object) throws NotFoundException {
-        return crudService.insert(object, respClass);
+    public ResponseEntity<?> insert(@RequestBody REQ request) throws NotFoundException {
+        RESP response = crudService.insert(request, responseType);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    // Update an existing entity
     @PutMapping("/{id}")
-    public RESP update(@PathVariable ID id, @RequestBody REQ object) throws NotFoundException {
-        return crudService.update(id, object, respClass);
+    public ResponseEntity<RESP> update(@PathVariable ID id, @RequestBody REQ request) throws NotFoundException {
+        RESP response = crudService.update(id, request, responseType);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

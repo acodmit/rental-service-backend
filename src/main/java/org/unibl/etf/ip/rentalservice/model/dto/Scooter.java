@@ -2,10 +2,9 @@ package org.unibl.etf.ip.rentalservice.model.dto;
 
 import lombok.*;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class Scooter {
+public class Scooter extends Vehicle{
     private Integer id;
-    private String model;
     private Integer maxSpeedKmh;
-    private Vehicle vehicle;
 }

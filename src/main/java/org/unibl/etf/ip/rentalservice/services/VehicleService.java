@@ -1,13 +1,25 @@
 package org.unibl.etf.ip.rentalservice.services;
 
+import org.springframework.web.multipart.MultipartFile;
 import org.unibl.etf.ip.rentalservice.core.CrudService;
 import org.unibl.etf.ip.rentalservice.model.dto.Vehicle;
+import org.unibl.etf.ip.rentalservice.model.requests.FaultRequest;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface VehicleService extends CrudService<Integer> {
-    List<Vehicle> getAllAvailableVehicles();
-    Vehicle getVehicleDetails(Integer id);
-    void updateVehicleStatus(Integer id, String status);
+    // Find all vehicles by type
+    // List<Vehicle> findByType(VehicleType type);
+
+    // Find all broken vehicles
+    List<Vehicle> findBrokenVehicles();
+
+    // Upload vehicles from csv
+    List<? extends Vehicle> uploadCsv(MultipartFile file);
+
+    // Add a failure to a vehicle
+    Vehicle addFailureToVehicle(Integer vehicleId, FaultRequest faultRequest);
+
+    // Delete a failure from a vehicle
+    boolean deleteVehicleFault(Integer vehicleId, Integer faultId);
 }

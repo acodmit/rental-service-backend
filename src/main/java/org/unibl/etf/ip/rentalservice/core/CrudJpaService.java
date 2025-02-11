@@ -4,17 +4,17 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
+import lombok.Getter;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Service;
 
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
 @Transactional
+@Getter
 public class CrudJpaService<E extends BaseEntity<ID>, ID extends Serializable> implements CrudService<ID> {
 
     private final JpaRepository<E, ID> repository;

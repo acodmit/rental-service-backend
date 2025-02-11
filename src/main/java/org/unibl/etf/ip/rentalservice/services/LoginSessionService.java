@@ -9,16 +9,10 @@ import org.unibl.etf.ip.rentalservice.model.requests.LoginSessionRequest;
 import java.util.List;
 import java.util.Optional;
 
-public interface LoginSessionService {
-    LoginSessionEntity save(LoginSessionEntity loginSession);
+public interface LoginSessionService extends CrudService<Integer> {
+    // Find active sessions for a user
+    List<LoginSession> findActiveSessionsByUserId(Integer userId);
 
-    Optional<LoginSessionEntity> findById(Integer id);
-
-    List<LoginSessionEntity> findAll();
-
-    LoginSessionEntity update(Integer id, LoginSessionEntity updatedSession);
-
-    void delete(Integer id);
-
-    List<LoginSession> findByUserId(Integer userId);
+    // Find all sessions for a user
+    List<LoginSession> findAllSessionsByUserId(Integer userId);
 }

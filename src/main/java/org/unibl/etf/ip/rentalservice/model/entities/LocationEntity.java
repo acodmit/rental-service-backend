@@ -1,5 +1,6 @@
 package org.unibl.etf.ip.rentalservice.model.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.unibl.etf.ip.rentalservice.core.BaseEntity;
@@ -22,8 +23,10 @@ public class LocationEntity implements BaseEntity<Integer> {
     @Column(name = "longitude", nullable = false, precision = 8)
     private BigDecimal longitude;
     @OneToMany(mappedBy = "pickUpLocation")
+    @JsonIgnore
     private List<RentalEntity> pickUpRentals;
     @OneToMany(mappedBy = "dropOffLocation")
+    @JsonIgnore
     private List<RentalEntity> dropOffRentals;
 
 }

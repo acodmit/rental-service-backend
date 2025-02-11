@@ -2,14 +2,17 @@ package org.unibl.etf.ip.rentalservice.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.unibl.etf.ip.rentalservice.model.dto.User;
+import org.unibl.etf.ip.rentalservice.model.entities.UserEntity;
 
-public interface UserEntityRepository extends JpaRepository<User, Integer> {
+import java.util.Optional;
+
+public interface UserEntityRepository extends JpaRepository<UserEntity, Integer> {
     // Find by username
-    User findByUsername(String username);
+    Optional<UserEntity> findByUsername(String username);
 
     // Find by email
-    User findByEmail(String email);
+    Optional<UserEntity> findByEmail(String email);
 
     // Find by phone number
-    User findByPhoneNumber(String phoneNumber);
+    Optional<UserEntity> findByPhoneNumber(String phoneNumber);
 }

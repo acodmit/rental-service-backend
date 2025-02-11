@@ -4,11 +4,10 @@ import lombok.*;
 import org.unibl.etf.ip.rentalservice.model.enums.UserType;
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class Employee {
+public class Employee extends User {
     private Integer id;
     private UserType role;
-    private User user;
     private List<Promotion> promotions;
-
 }
