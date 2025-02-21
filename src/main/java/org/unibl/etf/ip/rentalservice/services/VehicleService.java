@@ -18,7 +18,7 @@ public interface VehicleService extends CrudService<Integer> {
     List<? extends Vehicle> uploadCsv(MultipartFile file);
 
     // Add a failure to a vehicle
-    Vehicle addFailureToVehicle(Integer vehicleId, FaultRequest faultRequest);
+    Vehicle addFaultToVehicle(Integer vehicleId, FaultRequest faultRequest);
 
     // Delete a failure from a vehicle
     boolean deleteVehicleFault(Integer vehicleId, Integer faultId);

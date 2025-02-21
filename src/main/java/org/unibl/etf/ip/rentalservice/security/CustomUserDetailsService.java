@@ -1,39 +1,33 @@
 package org.unibl.etf.ip.rentalservice.security;
 
-//import org.springframework.security.core.authority.SimpleGrantedAuthority;
-//import org.springframework.security.core.userdetails.UserDetails;
-//import org.springframework.security.core.userdetails.UserDetailsService;
-//import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.unibl.etf.ip.rentalservice.model.dto.User;
-import org.unibl.etf.ip.rentalservice.model.entities.UserEntity;
 import org.unibl.etf.ip.rentalservice.repositories.UserEntityRepository;
 import org.unibl.etf.ip.rentalservice.services.UserService;
 
-import java.util.Collections;
-
-/*@Service
+@Service
 public class CustomUserDetailsService implements UserDetailsService {
+    private final UserEntityRepository userEntityRepository;
 
     private final UserService userService;
 
-    public CustomUserDetailsService(UserService userService) {
+    public CustomUserDetailsService(UserEntityRepository userEntityRepository, UserService userService) {
+        this.userEntityRepository = userEntityRepository;
         this.userService = userService;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userService.findByUsername(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found");
-        }
-
-        String role = userService.getUserRole(user.getId());
-
-        return new org.springframework.security.core.userdetails.User(
-                user.getUsername(), user.getPasswordHash(),
-                Collections.singleton(new SimpleGrantedAuthority(role))
-        );
+        return userEntityRepository.findByUsername(username)
+                .map(user -> User.withUsername(user.getUsername())
+                        .password(user.getPasswordHash())
+                        .passwordEncoder(password -> password) // Tell Spring Security NOT to hash it again
+                        .roles(userService.getUserRole(user.getId()))
+                        .build())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
-}*/
+}
 

@@ -2,11 +2,6 @@ package org.unibl.etf.ip.rentalservice.model.requests;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.unibl.etf.ip.rentalservice.model.dto.Client;
-import org.unibl.etf.ip.rentalservice.model.dto.Employee;
-import org.unibl.etf.ip.rentalservice.model.dto.LoginSession;
-
-import java.util.List;
 
 @Data
 @SuperBuilder
@@ -14,7 +9,7 @@ import java.util.List;
 @AllArgsConstructor
 public class UserRequest {
     private String username;
-    private String passwordHash;
+    private String password;
     private String firstName;
     private String lastName;
     private String email;

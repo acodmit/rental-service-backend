@@ -11,6 +11,8 @@ import org.unibl.etf.ip.rentalservice.model.dto.Employee;
 import org.unibl.etf.ip.rentalservice.model.dto.User;
 import org.unibl.etf.ip.rentalservice.model.entities.UserEntity;
 import org.unibl.etf.ip.rentalservice.model.enums.UserType;
+import org.unibl.etf.ip.rentalservice.repositories.ClientEntityRepository;
+import org.unibl.etf.ip.rentalservice.repositories.EmployeeEntityRepository;
 import org.unibl.etf.ip.rentalservice.repositories.UserEntityRepository;
 import org.unibl.etf.ip.rentalservice.services.ClientService;
 import org.unibl.etf.ip.rentalservice.services.EmployeeService;
@@ -27,13 +29,17 @@ public class UserServiceImpl extends CrudJpaService<UserEntity, Integer> impleme
 
     private final ClientService clientService;
     private final EmployeeService employeeService;
+    private final ClientEntityRepository clientEntityRepository;
+    private final EmployeeEntityRepository employeeEntityRepository;
 
     public UserServiceImpl(UserEntityRepository userEntityRepository, ModelMapper modelMapper,
-                           ClientService clientService, EmployeeService employeeService) {
+                           ClientService clientService, EmployeeService employeeService, ClientEntityRepository clientEntityRepository, EmployeeEntityRepository employeeEntityRepository) {
         super(userEntityRepository, UserEntity.class, modelMapper);
         this.userEntityRepository = userEntityRepository;
         this.clientService = clientService;
         this.employeeService = employeeService;
+        this.clientEntityRepository = clientEntityRepository;
+        this.employeeEntityRepository = employeeEntityRepository;
     }
 
     @Override
@@ -59,33 +65,23 @@ public class UserServiceImpl extends CrudJpaService<UserEntity, Integer> impleme
 
     public String getUserRole(Integer userId) {
         // Check if the user is a client
-        List<Client> clients = clientService.findAll(Client.class);
-        for (Client client : clients) {
-            if (client.getId().equals(userId)) {
-                return "CLIENT"; // User is a client
+        if (clientEntityRepository.existsById(userId)) {
+            return "CLIENT"; // User is a client
+        } else if (employeeEntityRepository.existsById(userId)) {
+            UserType role = employeeEntityRepository.findById(userId).orElseThrow(
+                    () -> new NotFoundException("User with ID " + userId + " not found.")
+            ).getRole();
+            if(UserType.ADMIN.equals(role)){
+                return "ADMIN";
+            }else if(UserType.OPERATOR.equals(role)) {
+                return "OPERATOR";
             }
+            return "OPERATOR";
         }
 
-        // Check if the user is an employee and return role
-        List<Employee> employees = employeeService.findAll(Employee.class);
-        for (Employee employee : employees) {
-            if (employee.getId().equals(userId)) {
-                UserType role = employee.getRole();
-                switch (role) {
-                    case ADMIN:
-                        return "ADMIN"; // User is an admin
-                    case OPERATOR:
-                        return "OPERATOR"; // User is an operator
-                    case MANAGER:
-                        return "MANAGER"; // User is a manager
-                    default:
-                        throw new IllegalArgumentException("Unknown role: " + role);
-                }
-            }
-        }
-
-        // If the user is not found in either Client or Employee services
+        // User is not found in either Client or Employee services
         throw new NotFoundException("User with ID " + userId + " not found.");
+
     }
     /*@Override
     public List<User> findAllUsersWithClientAndEmployee() {

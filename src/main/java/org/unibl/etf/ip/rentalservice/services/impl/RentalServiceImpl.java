@@ -3,21 +3,17 @@ package org.unibl.etf.ip.rentalservice.services.impl;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.pdf.PdfDocument;
 import com.itextpdf.text.pdf.PdfWriter;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.unibl.etf.ip.rentalservice.core.CrudJpaService;
+import org.unibl.etf.ip.rentalservice.exceptions.NotFoundException;
 import org.unibl.etf.ip.rentalservice.model.dto.Rental;
-import org.unibl.etf.ip.rentalservice.model.dto.User;
-import org.unibl.etf.ip.rentalservice.model.dto.Vehicle;
 import org.unibl.etf.ip.rentalservice.model.entities.RentalEntity;
 import org.unibl.etf.ip.rentalservice.model.requests.RentalRequest;
-import org.unibl.etf.ip.rentalservice.repositories.RentalEntityRepository;
+import org.unibl.etf.ip.rentalservice.repositories.*;
 import org.unibl.etf.ip.rentalservice.services.RentalService;
-import org.unibl.etf.ip.rentalservice.services.UserService;
-import org.unibl.etf.ip.rentalservice.services.VehicleService;
 
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
@@ -32,15 +28,18 @@ import java.util.stream.Collectors;
 public class RentalServiceImpl extends CrudJpaService<RentalEntity, Integer> implements RentalService {
 
     private final RentalEntityRepository rentalEntityRepository;
-    private final UserService userService;
-    private final VehicleService vehicleService;
+    private final VehicleEntityRepository vehicleEntityRepository;
+    private final ClientEntityRepository clientEntityRepository;
+    private final LocationEntityRepository locationEntityRepository;
 
-    public RentalServiceImpl(RentalEntityRepository rentalEntityRepository, ModelMapper modelMapper, UserService userService,
-                             VehicleService vehicleService) {
+    public RentalServiceImpl(RentalEntityRepository rentalEntityRepository, ModelMapper modelMapper,
+                             VehicleEntityRepository vehicleEntityRepository, ClientEntityRepository clientEntityRepository,
+                             LocationEntityRepository locationEntityRepository) {
         super(rentalEntityRepository, RentalEntity.class, modelMapper);
         this.rentalEntityRepository = rentalEntityRepository;
-        this.userService = userService;
-        this.vehicleService = vehicleService;
+        this.vehicleEntityRepository = vehicleEntityRepository;
+        this.clientEntityRepository = clientEntityRepository;
+        this.locationEntityRepository = locationEntityRepository;
     }
 
     @Override
@@ -77,10 +76,12 @@ public class RentalServiceImpl extends CrudJpaService<RentalEntity, Integer> imp
     }
 
     public Rental createRental(RentalRequest rentalRequest) {
-        // Validating if the user and vehicle exist
-        if (userService.findById(rentalRequest.getClientId(), User.class) == null ||
-                vehicleService.findById(rentalRequest.getVehicleId(), Vehicle.class) == null) {
-            throw new IllegalArgumentException("User or Vehicle not found.");
+        // Validating if the arguments exist in the database
+        if (!clientEntityRepository.existsById(rentalRequest.getClientId()) ||
+                !vehicleEntityRepository.existsById(rentalRequest.getVehicleId()) ||
+                !locationEntityRepository.existsById(rentalRequest.getPickUpLocationId()) ||
+                !locationEntityRepository.existsById(rentalRequest.getDropOffLocationId())) {
+            throw new IllegalArgumentException("Client or Vehicle not found.");
         }
 
         // Set the start date (current time)
@@ -97,28 +98,29 @@ public class RentalServiceImpl extends CrudJpaService<RentalEntity, Integer> imp
 
     @Override
     public Rental completeRental(Integer rentalId, RentalRequest rentalRequest) {
-        Rental rental = findById(rentalId, Rental.class);
-        if (rental == null || rental.getEndDate() != null) {
-            return null; // Already finished or not found
-        }
+        RentalEntity rentalEntity = rentalEntityRepository.findById(rentalId)
+                .orElseThrow(() -> new NotFoundException("Rental not found"));
 
-        RentalEntity rentalEntity = getModelMapper().map(rental, RentalEntity.class);
-        rentalEntity.setEndDate(new Timestamp(System.currentTimeMillis()));
+        Rental rental = getModelMapper().map(rentalEntity, Rental.class);
+
+        // Set the end date (current time)
+        rental.setEndDate(new Timestamp(System.currentTimeMillis()));
 
         // Calculate total duration in minutes
-        long durationMinutes = (rentalEntity.getEndDate().getTime() - rentalEntity.getStartDate().getTime()) / (60 * 1000);
-        rentalEntity.setTotalDurationMinutes((int) durationMinutes);
+        long durationMinutes = (rental.getEndDate().getTime() - rental.getStartDate().getTime()) / (60 * 1000);
+        rental.setTotalDurationMinutes((int) durationMinutes);
 
-        BigDecimal totalPrice;
-        BigDecimal hourlyRate = rentalEntity.getVehicle().getHourlyRate();
+        // Calculate total price
+        BigDecimal hourlyRate = rental.getVehicle().getHourlyRate();
         BigDecimal durationInHours = BigDecimal.valueOf(durationMinutes).divide(BigDecimal.valueOf(60), RoundingMode.HALF_UP);
+        rental.setTotalPrice(hourlyRate.multiply(durationInHours.compareTo(BigDecimal.ONE) < 1 ? BigDecimal.ONE : durationInHours));
 
-        totalPrice = hourlyRate.multiply(durationInHours.compareTo(BigDecimal.ONE) < 1 ? BigDecimal.ONE : durationInHours);
-        rentalEntity.setTotalPrice(totalPrice);
+        RentalEntity updatedRentalEntity = getModelMapper().map(rental, RentalEntity.class);
 
-        RentalEntity updatedRentalEntity = rentalEntityRepository.saveAndFlush(rentalEntity);
+        updatedRentalEntity = rentalEntityRepository.saveAndFlush(updatedRentalEntity);
         return getModelMapper().map(updatedRentalEntity, Rental.class);
     }
+
 
     @Override
     public byte[] generateInvoicePdf(Rental rental) {

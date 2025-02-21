@@ -7,7 +7,6 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class Employee extends User {
-    private Integer id;
     private UserType role;
     private List<Promotion> promotions;
 }

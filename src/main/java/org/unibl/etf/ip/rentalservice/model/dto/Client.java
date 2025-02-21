@@ -8,7 +8,7 @@ import java.util.List;
 public class Client extends User {
     private Integer id;
     private String avatarUrl;
-    private String idCardNumber;
+    private String cardNumber;
     private Boolean isBlocked;
     //private List<Rental> rentals;
 }

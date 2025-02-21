@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.unibl.etf.ip.rentalservice.model.dto.Rental;
 import org.unibl.etf.ip.rentalservice.model.entities.RentalEntity;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 public interface RentalEntityRepository extends JpaRepository<RentalEntity, Integer> {
@@ -15,4 +16,8 @@ public interface RentalEntityRepository extends JpaRepository<RentalEntity, Inte
 
     // Find active rentals (end date is null)
     List<RentalEntity> findByEndDateIsNull();
+
+    // Revenue by month, grouped by day (using derived queries)
+    List<RentalEntity> findByStartDateBetweenOrderByStartDate(Timestamp startDate, Timestamp endDate);
+
 }

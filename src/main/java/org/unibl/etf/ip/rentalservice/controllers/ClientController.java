@@ -9,26 +9,24 @@ import org.springframework.web.bind.annotation.RestController;
 import org.unibl.etf.ip.rentalservice.core.CrudController;
 import org.unibl.etf.ip.rentalservice.exceptions.NotFoundException;
 import org.unibl.etf.ip.rentalservice.model.dto.Client;
-import org.unibl.etf.ip.rentalservice.model.dto.Employee;
 import org.unibl.etf.ip.rentalservice.model.requests.ClientRequest;
-import org.unibl.etf.ip.rentalservice.model.requests.EmployeeRequest;
-import org.unibl.etf.ip.rentalservice.services.EmployeeService;
+import org.unibl.etf.ip.rentalservice.services.ClientService;
 
 @RestController
-@RequestMapping("/employees")
-public class EmployeeController extends CrudController<Integer, EmployeeRequest, Employee> {
+@RequestMapping("/clients")
+public class ClientController extends CrudController<Integer, ClientRequest, Client> {
 
-    private final EmployeeService employeeService;
+    private final ClientService clientService;
 
-    public EmployeeController(final EmployeeService employeeService) {
-        super(Employee.class, employeeService);
-        this.employeeService = employeeService;
+    public ClientController(final ClientService clientService) {
+        super(Client.class, clientService);
+        this.clientService = clientService;
     }
 
     @Override
     @PostMapping
-    public ResponseEntity<?> insert(@RequestBody EmployeeRequest request) throws NotFoundException {
-        Employee response = employeeService.insertEmployee(request);
+    public ResponseEntity<?> insert(@RequestBody ClientRequest request) throws NotFoundException {
+        Client response = clientService.insertClient(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }

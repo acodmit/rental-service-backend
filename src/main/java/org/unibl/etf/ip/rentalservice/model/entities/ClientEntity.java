@@ -17,8 +17,8 @@ public class ClientEntity extends UserEntity{
     @Column(name = "avatar_url", nullable = true, length = 255)
     private String avatarUrl;
     @Basic
-    @Column(name = "id_card_number", nullable = false, length = 20)
-    private String idCardNumber;
+    @Column(name = "card_number", nullable = false, length = 20)
+    private String cardNumber;
     @Basic
     @Column(name = "is_blocked", nullable = true)
     private Boolean isBlocked;

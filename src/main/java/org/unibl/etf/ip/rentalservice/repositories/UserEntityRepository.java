@@ -7,6 +7,10 @@ import org.unibl.etf.ip.rentalservice.model.entities.UserEntity;
 import java.util.Optional;
 
 public interface UserEntityRepository extends JpaRepository<UserEntity, Integer> {
+
+    // Check if user exists by username
+    Boolean existsByUsername(String username);
+
     // Find by username
     Optional<UserEntity> findByUsername(String username);
 

@@ -12,4 +12,5 @@ public interface BikeEntityRepository extends JpaRepository<BikeEntity, Integer>
 
     // Find bikes by range
     List<BikeEntity> findByRangeKmGreaterThanEqual(int rangeKm);
+
 }

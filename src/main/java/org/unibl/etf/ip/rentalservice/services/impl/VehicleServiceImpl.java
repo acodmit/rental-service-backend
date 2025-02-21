@@ -2,7 +2,8 @@ package org.unibl.etf.ip.rentalservice.services.impl;
 
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
-import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,12 +11,12 @@ import org.springframework.web.multipart.MultipartFile;
 import org.unibl.etf.ip.rentalservice.core.CrudJpaService;
 import org.unibl.etf.ip.rentalservice.exceptions.NotFoundException;
 import org.unibl.etf.ip.rentalservice.model.dto.*;
-import org.unibl.etf.ip.rentalservice.model.entities.VehicleEntity;
+import org.unibl.etf.ip.rentalservice.model.entities.*;
 import org.unibl.etf.ip.rentalservice.model.requests.BikeRequest;
 import org.unibl.etf.ip.rentalservice.model.requests.CarRequest;
 import org.unibl.etf.ip.rentalservice.model.requests.FaultRequest;
 import org.unibl.etf.ip.rentalservice.model.requests.ScooterRequest;
-import org.unibl.etf.ip.rentalservice.repositories.VehicleEntityRepository;
+import org.unibl.etf.ip.rentalservice.repositories.*;
 import org.unibl.etf.ip.rentalservice.services.*;
 
 import java.io.BufferedReader;
@@ -32,24 +33,20 @@ import java.util.stream.Collectors;
 public class VehicleServiceImpl extends CrudJpaService<VehicleEntity, Integer> implements VehicleService {
 
     private final VehicleEntityRepository vehicleEntityRepository;
-
-    private final ManufacturerService manufacturerService;
-    private final BikeService bikeService;
-    private final CarService carService;
-    private final ScooterService scooterService;
-    private final FaultService faultService;
+    private final BikeEntityRepository bikeEntityRepository;
+    private final CarEntityRepository carEntityRepository;
+    private final ScooterEntityRepository scooterEntityRepository;
+    private final FaultEntityRepository faultEntityRepository;
 
     public VehicleServiceImpl(VehicleEntityRepository vehicleEntityRepository, ModelMapper modelMapper,
-                              ManufacturerService manufacturerService,
-                              BikeService bikeService, CarService carService, ScooterService scooterService,
-                              FaultService faultService) {
+                              BikeEntityRepository bikeEntityRepository, CarEntityRepository carEntityRepository, ScooterEntityRepository scooterEntityRepository,
+                              FaultEntityRepository faultEntityRepository) {
         super(vehicleEntityRepository, VehicleEntity.class, modelMapper);
         this.vehicleEntityRepository = vehicleEntityRepository;
-        this.manufacturerService = manufacturerService;
-        this.bikeService = bikeService;
-        this.carService = carService;
-        this.scooterService = scooterService;
-        this.faultService = faultService;
+        this.bikeEntityRepository = bikeEntityRepository;
+        this.carEntityRepository = carEntityRepository;
+        this.scooterEntityRepository = scooterEntityRepository;
+        this.faultEntityRepository = faultEntityRepository;
     }
 
     @Override
@@ -101,7 +98,7 @@ public class VehicleServiceImpl extends CrudJpaService<VehicleEntity, Integer> i
     }
 
     private Bike insertBike(String[] line) {
-        return bikeService.insert((BikeRequest.builder()
+        BikeEntity bikeEntity = getModelMapper().map(BikeRequest.builder()
                 .acquisitionDate(Timestamp.valueOf(line[1]))
                 .purchasePrice(new BigDecimal(line[2]))
                 .isBroken(Boolean.parseBoolean(line[3]))
@@ -110,11 +107,15 @@ public class VehicleServiceImpl extends CrudJpaService<VehicleEntity, Integer> i
                 .hourlyRate(new BigDecimal(line[6]))
                 .manufacturerId(Integer.parseInt(line[7]))
                 .rangeKm(Integer.parseInt(line[8]))
-                .build()), Bike.class);
+                .build(), BikeEntity.class);
+        bikeEntity.setId(null);
+        bikeEntity = bikeEntityRepository.saveAndFlush(bikeEntity);
+        getEntityManager().refresh(bikeEntity);
+        return getModelMapper().map(bikeEntity, Bike.class);
     }
 
     private Car insertCar(String[] line) {
-        return carService.insert((CarRequest.builder()
+        CarEntity carEntity = getModelMapper().map(CarRequest.builder()
                 .acquisitionDate(Timestamp.valueOf(line[1]))
                 .purchasePrice(new BigDecimal(line[2]))
                 .isBroken(Boolean.parseBoolean(line[3]))
@@ -123,11 +124,15 @@ public class VehicleServiceImpl extends CrudJpaService<VehicleEntity, Integer> i
                 .hourlyRate(new BigDecimal(line[6]))
                 .manufacturerId(Integer.parseInt(line[7]))
                 .description(line[8])
-                .build()), Car.class);
+                .build(), CarEntity.class);
+        carEntity.setId(null);
+        carEntity = carEntityRepository.saveAndFlush(carEntity);
+        getEntityManager().refresh(carEntity);
+        return getModelMapper().map(carEntity, Car.class);
     }
 
     private Scooter insertScooter(String[] line) {
-        return scooterService.insert((ScooterRequest.builder()
+        ScooterEntity scooterEntity = getModelMapper().map(ScooterRequest.builder()
                 .acquisitionDate(Timestamp.valueOf(line[1]))
                 .purchasePrice(new BigDecimal(line[2]))
                 .isBroken(Boolean.parseBoolean(line[3]))
@@ -136,58 +141,42 @@ public class VehicleServiceImpl extends CrudJpaService<VehicleEntity, Integer> i
                 .hourlyRate(new BigDecimal(line[6]))
                 .manufacturerId(Integer.parseInt(line[7]))
                 .maxSpeedKmh(Integer.parseInt(line[8]))
-                .build()), Scooter.class);
+                .build(), ScooterEntity.class);
+        scooterEntity.setId(null);
+        scooterEntity = scooterEntityRepository.saveAndFlush(scooterEntity);
+        getEntityManager().refresh(scooterEntity);
+        return getModelMapper().map(scooterEntity, Scooter.class);
     }
 
-    public Vehicle addFailureToVehicle(Integer vehicleId, FaultRequest faultRequest) {
-        // Find the vehicle
-        Vehicle vehicle = findById(vehicleId, Vehicle.class);
-        if (vehicle == null) {
+    public Vehicle addFaultToVehicle(Integer vehicleId, FaultRequest faultRequest) {
+        // Check if the vehicle exists
+        if (!vehicleEntityRepository.existsById(vehicleId)) {
             throw new NotFoundException("Vehicle with ID " + vehicleId + " not found");
         }
         // Create the fault
-        faultService.insert(faultRequest, Fault.class);
+        faultEntityRepository.saveAndFlush(getModelMapper().map(faultRequest, FaultEntity.class));
 
-        return vehicle;
+        return vehicleEntityRepository.findById(vehicleId)
+                .map(vehicle -> getModelMapper().map(vehicle, Vehicle.class))
+                .orElseThrow(() -> new NotFoundException("Vehicle with ID " + vehicleId + " not found"));
     }
 
     public boolean deleteVehicleFault(Integer vehicleId, Integer faultId) {
-        // Find the fault
-        Fault fault = faultService.findById(faultId, Fault.class);
-        if (fault == null) {
-            throw new EntityNotFoundException("Fault with ID " + faultId + " not found");
+        // Check if the fault exists
+        if (!faultEntityRepository.existsById(faultId)) {
+            throw new NotFoundException("Fault with ID " + faultId + " not found");
         }
 
         // Check if the fault belongs to the vehicle
-        if (!findById(vehicleId, Vehicle.class).getFaults().contains(fault)) {
+        if (!vehicleEntityRepository.findById(vehicleId)
+                .map(vehicle -> vehicle.getFaults().stream().anyMatch(fault -> fault.getId().equals(faultId)))
+                .orElse(false)) {
             return false;
         }
 
         // Delete the fault
-        faultService.delete(faultId);
+        faultEntityRepository.delete(faultEntityRepository.findById(faultId)
+                .orElseThrow(() -> new NotFoundException("Fault with ID " + faultId + " not found")));
         return true;
     }
-
-    /*public void uploadCsv(MultipartFile file) {
-        List<Vehicle> vehicles = csvParserService.parseVehicles(file);
-        vehicleRepository.saveAll(vehicles);
-    }
-
-    public List<Rental> getRentals(Integer vehicleId) {
-        return rentalRepository.findByVehicleId(vehicleId);
-    }
-
-    public List<Fault> getFailures(Integer vehicleId) {
-        return faultRepository.findByVehicleId(vehicleId);
-    }
-
-
-    public boolean deleteFailure(Integer vehicleId, Integer failureId) {
-        Optional<Fault> fault = faultRepository.findById(failureId);
-        if (fault.isPresent() && fault.get().getVehicle().getId().equals(vehicleId)) {
-            faultRepository.deleteById(failureId);
-            return true;
-        }
-        return false;
-    }*/
 }

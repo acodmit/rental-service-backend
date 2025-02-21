@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import lombok.Getter;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.unibl.etf.ip.rentalservice.exceptions.NotFoundException;
 
 
 import java.io.Serializable;
@@ -55,7 +56,7 @@ public class CrudJpaService<E extends BaseEntity<ID>, ID extends Serializable> i
     @Override
     public <T, U> T update(ID id, U object, Class<T> resultDtoClass) {
         if (!repository.existsById(id)) {
-            throw new EntityNotFoundException("Entity not found");
+            throw new NotFoundException("Entity not found");
         }
         E entity = modelMapper.map(object, entityClass);
         entity.setId(id);
@@ -67,12 +68,12 @@ public class CrudJpaService<E extends BaseEntity<ID>, ID extends Serializable> i
     @Override
     public void delete(ID id) {
         if (!repository.existsById(id)) {
-            throw new EntityNotFoundException("Entity not found");
+            throw new NotFoundException("Entity not found");
         }
         repository.deleteById(id);
     }
 
     private E findEntityById(ID id) {
-        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Entity not found"));
+        return repository.findById(id).orElseThrow(() -> new NotFoundException("Entity not found"));
     }
 }
