@@ -3,11 +3,9 @@ package org.unibl.etf.ip.rentalservice.services;
 import org.unibl.etf.ip.rentalservice.core.CrudService;
 import org.unibl.etf.ip.rentalservice.model.dto.User;
 
-import java.util.List;
-
 public interface UserService extends CrudService<Integer> {
     // Find user by username
-    User findByUsername(String username);
+    User getUserInfo(String username);
 
     // Find user by email
     User findByEmail(String email);

@@ -14,5 +14,4 @@ public class UserRequest {
     private String lastName;
     private String email;
     private String phoneNumber;
-    //private List<LoginSession> loginSessions;
 }

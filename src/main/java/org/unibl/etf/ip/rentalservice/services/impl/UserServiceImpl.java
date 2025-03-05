@@ -43,7 +43,7 @@ public class UserServiceImpl extends CrudJpaService<UserEntity, Integer> impleme
     }
 
     @Override
-    public User findByUsername(String username) {
+    public User getUserInfo(String username) {
         UserEntity userEntity = userEntityRepository.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("User with username " + username + " not found"));
         return getModelMapper().map(userEntity, User.class);

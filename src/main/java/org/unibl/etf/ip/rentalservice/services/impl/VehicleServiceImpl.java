@@ -2,8 +2,6 @@ package org.unibl.etf.ip.rentalservice.services.impl;
 
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -148,35 +146,54 @@ public class VehicleServiceImpl extends CrudJpaService<VehicleEntity, Integer> i
         return getModelMapper().map(scooterEntity, Scooter.class);
     }
 
-    public Vehicle addFaultToVehicle(Integer vehicleId, FaultRequest faultRequest) {
+    @Override
+    public Fault addFaultToVehicle(Integer vehicleId, FaultRequest faultRequest) {
         // Check if the vehicle exists
-        if (!vehicleEntityRepository.existsById(vehicleId)) {
-            throw new NotFoundException("Vehicle with ID " + vehicleId + " not found");
-        }
-        // Create the fault
-        faultEntityRepository.saveAndFlush(getModelMapper().map(faultRequest, FaultEntity.class));
-
-        return vehicleEntityRepository.findById(vehicleId)
-                .map(vehicle -> getModelMapper().map(vehicle, Vehicle.class))
+        VehicleEntity vehicleEntity = vehicleEntityRepository.findById(vehicleId)
                 .orElseThrow(() -> new NotFoundException("Vehicle with ID " + vehicleId + " not found"));
+
+        // Update isBroken if it's currently false
+        if (Boolean.FALSE.equals(vehicleEntity.getIsBroken())) {
+            vehicleEntity.setIsBroken(true);
+            vehicleEntityRepository.save(vehicleEntity); // Persist change
+        }
+
+        // Map the FaultRequest to FaultEntity
+        FaultEntity faultEntity = getModelMapper().map(faultRequest, FaultEntity.class);
+        faultEntity.setId(null);
+        faultEntity.setVehicle(vehicleEntity); // Set the vehicle relationship
+
+        // Save the fault
+        FaultEntity savedFault = faultEntityRepository.save(faultEntity);
+
+        // Map to DTO and return
+        return getModelMapper().map(savedFault, Fault.class);
     }
 
+    @Override
     public boolean deleteVehicleFault(Integer vehicleId, Integer faultId) {
         // Check if the fault exists
-        if (!faultEntityRepository.existsById(faultId)) {
-            throw new NotFoundException("Fault with ID " + faultId + " not found");
-        }
+        FaultEntity faultEntity = faultEntityRepository.findById(faultId)
+                .orElseThrow(() -> new NotFoundException("Fault with ID " + faultId + " not found"));
 
         // Check if the fault belongs to the vehicle
-        if (!vehicleEntityRepository.findById(vehicleId)
-                .map(vehicle -> vehicle.getFaults().stream().anyMatch(fault -> fault.getId().equals(faultId)))
-                .orElse(false)) {
+        VehicleEntity vehicleEntity = vehicleEntityRepository.findById(vehicleId)
+                .orElseThrow(() -> new NotFoundException("Vehicle with ID " + vehicleId + " not found"));
+
+        if (!faultEntity.getVehicle().getId().equals(vehicleId)) {
             return false;
         }
 
         // Delete the fault
-        faultEntityRepository.delete(faultEntityRepository.findById(faultId)
-                .orElseThrow(() -> new NotFoundException("Fault with ID " + faultId + " not found")));
+        faultEntityRepository.delete(faultEntity);
+
+        // Check if the vehicle has any remaining faults
+        if (faultEntityRepository.findByVehicleId(vehicleId).isEmpty()) {
+            vehicleEntity.setIsBroken(false);
+            vehicleEntityRepository.save(vehicleEntity); // Persist change
+        }
+
         return true;
     }
+
 }

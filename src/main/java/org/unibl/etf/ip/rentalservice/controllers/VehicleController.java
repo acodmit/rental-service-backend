@@ -67,9 +67,9 @@ public class VehicleController extends CrudController<Integer, VehicleRequest, V
     }
 
     @PostMapping("/{id}/faults")
-    public ResponseEntity<Vehicle> addFaultToVehicle(@PathVariable Integer id, @RequestBody FaultRequest faultRequest) {
-        Vehicle updatedVehicle = vehicleService.addFaultToVehicle(id, faultRequest);
-        return new ResponseEntity<>(updatedVehicle, HttpStatus.OK);
+    public ResponseEntity<Fault> addFaultToVehicle(@PathVariable Integer id, @RequestBody FaultRequest faultRequest) {
+        Fault fault = vehicleService.addFaultToVehicle(id, faultRequest);
+        return new ResponseEntity<>(fault, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}/faults/{failureId}")

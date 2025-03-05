@@ -23,7 +23,7 @@ public class RentalController extends CrudController<Integer, RentalRequest, Ren
     @PostMapping
     public ResponseEntity<Rental> insert(@Valid @RequestBody RentalRequest rentalRequest) {
         try {
-            Rental createdRental = rentalService.createRental(rentalRequest);
+            Rental createdRental = rentalService.addRental(rentalRequest);
             return new ResponseEntity<>(createdRental, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

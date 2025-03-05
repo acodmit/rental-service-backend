@@ -75,7 +75,7 @@ public class RentalServiceImpl extends CrudJpaService<RentalEntity, Integer> imp
         return getModelMapper().map(updatedRentalEntity, Rental.class);
     }
 
-    public Rental createRental(RentalRequest rentalRequest) {
+    public Rental addRental(RentalRequest rentalRequest) {
         // Validating if the arguments exist in the database
         if (!clientEntityRepository.existsById(rentalRequest.getClientId()) ||
                 !vehicleEntityRepository.existsById(rentalRequest.getVehicleId()) ||
@@ -91,6 +91,7 @@ public class RentalServiceImpl extends CrudJpaService<RentalEntity, Integer> imp
 
         // Save and return the created rental
         RentalEntity rentalEntity = getModelMapper().map(rentalRequest, RentalEntity.class);
+
         RentalEntity createdRentalEntity = rentalEntityRepository.save(rentalEntity);
         return getModelMapper().map(createdRentalEntity, Rental.class);
     }

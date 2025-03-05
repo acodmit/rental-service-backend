@@ -2,6 +2,7 @@ package org.unibl.etf.ip.rentalservice.services;
 
 import org.springframework.web.multipart.MultipartFile;
 import org.unibl.etf.ip.rentalservice.core.CrudService;
+import org.unibl.etf.ip.rentalservice.model.dto.Fault;
 import org.unibl.etf.ip.rentalservice.model.dto.Vehicle;
 import org.unibl.etf.ip.rentalservice.model.requests.FaultRequest;
 
@@ -18,7 +19,7 @@ public interface VehicleService extends CrudService<Integer> {
     List<? extends Vehicle> uploadCsv(MultipartFile file);
 
     // Add a failure to a vehicle
-    Vehicle addFaultToVehicle(Integer vehicleId, FaultRequest faultRequest);
+    Fault addFaultToVehicle(Integer vehicleId, FaultRequest faultRequest);
 
     // Delete a failure from a vehicle
     boolean deleteVehicleFault(Integer vehicleId, Integer faultId);

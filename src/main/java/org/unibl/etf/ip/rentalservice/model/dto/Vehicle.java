@@ -15,7 +15,7 @@ public class Vehicle {
     private String imageUrl;
     private String model;
     private Manufacturer manufacturer;
-    private List<Fault> faults;
-    private BigDecimal hourlyRate;
+    //private List<Fault> faults;
     //private List<Rental> rentals;
+    private BigDecimal hourlyRate;
 }

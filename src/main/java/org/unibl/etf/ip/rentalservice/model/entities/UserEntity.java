@@ -35,8 +35,5 @@ public class UserEntity implements BaseEntity<Integer> {
     @Basic
     @Column(name = "phone_number", nullable = true, length = 50)
     private String phoneNumber;
-    @OneToMany(mappedBy = "user")
-    @JsonIgnore
-    private List<LoginSessionEntity> loginSessions;
 
 }

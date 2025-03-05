@@ -11,16 +11,19 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
+import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
+    private final CorsFilter corsFilter;
 
-    public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter, CorsFilter corsFilter) {
         this.jwtAuthFilter = jwtAuthFilter;
+        this.corsFilter = corsFilter;
     }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -32,6 +35,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated() // All other API endpoints require authentication
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(corsFilter, JwtAuthFilter.class) // Add CorsFilter before JwtAuthFilter
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/**")); // Disable CSRF for all endpoints
 
         return http.build();

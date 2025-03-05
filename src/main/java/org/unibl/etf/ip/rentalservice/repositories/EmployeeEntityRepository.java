@@ -10,4 +10,7 @@ import java.util.List;
 public interface EmployeeEntityRepository extends JpaRepository<EmployeeEntity, Integer> {
     // Find employees by role
     List<EmployeeEntity> findByRole(UserType role);
+
+    // Find employee by username
+    EmployeeEntity findByUsername(String username);
 }

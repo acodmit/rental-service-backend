@@ -15,7 +15,7 @@ public class FaultEntity implements BaseEntity<Integer> {
     @Column(name = "id", nullable = false)
     private Integer id;
     @Basic
-    @Column(name = "description", nullable = false, length = -1)
+    @Column(name = "description", nullable = false, length = 1000)
     private String description;
     @Basic
     @Column(name = "reported_date", nullable = false)

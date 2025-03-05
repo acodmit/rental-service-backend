@@ -42,11 +42,11 @@ public class VehicleEntity implements BaseEntity<Integer> {
     @Basic
     @Column(name = "hourly_rate", nullable = false, precision = 10, scale = 2)
     private BigDecimal hourlyRate;
-    @OneToMany(mappedBy = "vehicle")
     @JsonIgnore
+    @OneToMany(mappedBy = "vehicle")
     private List<FaultEntity> faults;
-    @OneToMany(mappedBy = "vehicle")
     @JsonIgnore
+    @OneToMany(mappedBy = "vehicle")
     private List<RentalEntity> rentals;
     @ManyToOne
     @JoinColumn(name = "manufacturer_id", referencedColumnName = "id", nullable = false)

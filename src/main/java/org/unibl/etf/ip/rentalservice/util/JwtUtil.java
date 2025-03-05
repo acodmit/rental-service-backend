@@ -23,11 +23,12 @@ public class JwtUtil {
     @Value("${jwt.expirationMs}")
     private long expirationMs;
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(UserDetails userDetails, String role) {
         Timestamp expirationTime = new Timestamp(System.currentTimeMillis() + expirationMs);
 
         return JWT.create()
                 .withSubject(userDetails.getUsername())
+                .withClaim("role", role)
                 .withIssuedAt(new Timestamp(System.currentTimeMillis()))
                 .withExpiresAt(expirationTime)
                 .sign(Algorithm.HMAC256(secretKey));
