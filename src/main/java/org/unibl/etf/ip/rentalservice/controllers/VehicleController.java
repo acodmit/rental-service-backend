@@ -14,7 +14,9 @@ import org.unibl.etf.ip.rentalservice.services.VehicleService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/vehicles")
@@ -76,5 +78,15 @@ public class VehicleController extends CrudController<Integer, VehicleRequest, V
     public ResponseEntity<Void> deleteVehicleFault(@PathVariable Integer id, @PathVariable Integer failureId) {
         boolean deleted = vehicleService.deleteVehicleFault(id, failureId);
         return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    }
+
+    // Update the hourly rate of a vehicle
+    @PatchMapping("/{id}/hourly-rate")
+    public ResponseEntity<Vehicle> updateHourlyRate(
+            @PathVariable Integer id,
+            @RequestBody Map<String, BigDecimal> updateRequest) {
+        BigDecimal newHourlyRate = updateRequest.get("hourlyRate");
+        Vehicle updatedVehicle = vehicleService.setHourlyRate(id, newHourlyRate);
+        return ResponseEntity.ok(updatedVehicle);
     }
 }

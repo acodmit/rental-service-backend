@@ -18,4 +18,5 @@ public class Vehicle {
     //private List<Fault> faults;
     //private List<Rental> rentals;
     private BigDecimal hourlyRate;
+    private Location location;
 }

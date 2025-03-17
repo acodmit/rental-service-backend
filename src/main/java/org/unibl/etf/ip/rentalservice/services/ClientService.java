@@ -15,4 +15,7 @@ public interface ClientService extends CrudService<Integer> {
 
     // Insert a new client
     Client insertClient(ClientRequest clientRequest);
+
+    // Toggle block status of a client
+    void toggleBlockStatus(Integer clientId, boolean isBlocked);
 }

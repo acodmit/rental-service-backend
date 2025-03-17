@@ -6,6 +6,7 @@ import org.unibl.etf.ip.rentalservice.model.dto.Fault;
 import org.unibl.etf.ip.rentalservice.model.dto.Vehicle;
 import org.unibl.etf.ip.rentalservice.model.requests.FaultRequest;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface VehicleService extends CrudService<Integer> {
@@ -23,4 +24,7 @@ public interface VehicleService extends CrudService<Integer> {
 
     // Delete a failure from a vehicle
     boolean deleteVehicleFault(Integer vehicleId, Integer faultId);
+
+    // Set new hourly rate for a vehicle
+    Vehicle setHourlyRate(Integer vehicleId, BigDecimal hourlyRate);
 }

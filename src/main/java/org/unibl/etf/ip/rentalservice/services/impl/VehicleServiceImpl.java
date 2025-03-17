@@ -104,7 +104,8 @@ public class VehicleServiceImpl extends CrudJpaService<VehicleEntity, Integer> i
                 .model(line[5])
                 .hourlyRate(new BigDecimal(line[6]))
                 .manufacturerId(Integer.parseInt(line[7]))
-                .rangeKm(Integer.parseInt(line[8]))
+                .locationId(Integer.parseInt(line[8]))
+                .rangeKm(Integer.parseInt(line[9]))
                 .build(), BikeEntity.class);
         bikeEntity.setId(null);
         bikeEntity = bikeEntityRepository.saveAndFlush(bikeEntity);
@@ -121,7 +122,8 @@ public class VehicleServiceImpl extends CrudJpaService<VehicleEntity, Integer> i
                 .model(line[5])
                 .hourlyRate(new BigDecimal(line[6]))
                 .manufacturerId(Integer.parseInt(line[7]))
-                .description(line[8])
+                .locationId(Integer.parseInt(line[8]))
+                .description(line[9])
                 .build(), CarEntity.class);
         carEntity.setId(null);
         carEntity = carEntityRepository.saveAndFlush(carEntity);
@@ -138,7 +140,8 @@ public class VehicleServiceImpl extends CrudJpaService<VehicleEntity, Integer> i
                 .model(line[5])
                 .hourlyRate(new BigDecimal(line[6]))
                 .manufacturerId(Integer.parseInt(line[7]))
-                .maxSpeedKmh(Integer.parseInt(line[8]))
+                .locationId(Integer.parseInt(line[8]))
+                .maxSpeedKmh(Integer.parseInt(line[9]))
                 .build(), ScooterEntity.class);
         scooterEntity.setId(null);
         scooterEntity = scooterEntityRepository.saveAndFlush(scooterEntity);
@@ -196,4 +199,15 @@ public class VehicleServiceImpl extends CrudJpaService<VehicleEntity, Integer> i
         return true;
     }
 
+    // Update the hourly rate of a vehicle
+    public Vehicle setHourlyRate(Integer id, BigDecimal newHourlyRate) {
+        VehicleEntity vehicleEntity = vehicleEntityRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Vehicle with ID " + id + " not found"));
+
+        vehicleEntity.setHourlyRate(newHourlyRate); // Update the hourly rate
+        VehicleEntity updatedVehicleEntity = vehicleEntityRepository.save(vehicleEntity); // Save the changes
+
+        // Map the updated entity to a DTO and return
+        return getModelMapper().map(updatedVehicleEntity, Vehicle.class);
+    }
 }

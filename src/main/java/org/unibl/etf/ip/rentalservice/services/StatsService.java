@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 public interface StatsService {
 
     // Get total revenue by day for a given month
-    List<RevenueByDay> getRevenueByMonth(int month);
+    List<RevenueByDay> getRevenueByMonth(String yearMonth);
 
     // Get total revenue by bike
     RevenueByVehicleType getRevenueByBike();
@@ -38,5 +38,5 @@ public interface StatsService {
     RevenueByVehicleType getRevenueByScooter();
 
     // Get faults number by each vehicle
-    Map<Vehicle, Integer> getFaultsByVehicle();
+    Map<String, Integer> getFaultsByVehicle();
 }

@@ -15,5 +15,4 @@ public class ClientRequest extends UserRequest {
     private String avatarUrl;
     private String cardNumber;
     private Boolean isBlocked;
-    //private List<Rental> rentals;
 }

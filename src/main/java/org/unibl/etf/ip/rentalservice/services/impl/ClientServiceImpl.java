@@ -7,6 +7,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.unibl.etf.ip.rentalservice.core.CrudJpaService;
+import org.unibl.etf.ip.rentalservice.exceptions.NotFoundException;
 import org.unibl.etf.ip.rentalservice.model.dto.Client;
 import org.unibl.etf.ip.rentalservice.model.entities.ClientEntity;
 import org.unibl.etf.ip.rentalservice.model.requests.ClientRequest;
@@ -51,6 +52,13 @@ public class ClientServiceImpl extends CrudJpaService<ClientEntity, Integer> imp
         clientEntity = clientEntityRepository.saveAndFlush(clientEntity);
         getEntityManager().refresh(clientEntity);
         return getModelMapper().map(clientEntity, Client.class);
+    }
+
+    public void toggleBlockStatus(Integer clientId, boolean isBlocked) {
+        var client = clientEntityRepository.findById(clientId)
+                .orElseThrow(() -> new NotFoundException("Client not found with id: " + clientId));
+        client.setIsBlocked(isBlocked);
+        clientEntityRepository.save(client);
     }
 
 //    @Override

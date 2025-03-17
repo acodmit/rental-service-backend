@@ -23,16 +23,16 @@ public class StatsController {
     }
 
     // Endpoint to get revenue for a specific month (grouped by day)
-    @GetMapping("/revenue/{month}")
-    public ResponseEntity<List<RevenueByDay>> getRevenueByDay(@PathVariable int month) {
-        List<RevenueByDay> revenueData = statsService.getRevenueByMonth(month);
+    @GetMapping("/revenue/{yearMonth}")
+    public ResponseEntity<List<RevenueByDay>> getRevenueByDay(@PathVariable String yearMonth) {
+        List<RevenueByDay> revenueData = statsService.getRevenueByMonth(yearMonth);
         return new ResponseEntity<>(revenueData, HttpStatus.OK);
     }
 
-    // Endpoint to get failure count by vehicle type
+    // Endpoint to get failure count by vehicle
     @GetMapping("/faults")
-    public ResponseEntity<Map<Vehicle, Integer>> getFaultsByVehicle() {
-        Map<Vehicle, Integer> faultsByVehicle = statsService.getFaultsByVehicle();
+    public ResponseEntity<Map<String, Integer>> getFaultsByVehicle() {
+        Map<String, Integer> faultsByVehicle = statsService.getFaultsByVehicle();
         return new ResponseEntity<>(faultsByVehicle, HttpStatus.OK);
     }
 

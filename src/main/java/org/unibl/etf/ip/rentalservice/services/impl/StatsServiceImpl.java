@@ -17,6 +17,8 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -47,13 +49,21 @@ public class StatsServiceImpl implements StatsService {
     }
 
     // Get total revenue by day for a given month
-    public List<RevenueByDay> getRevenueByMonth(int month) {
+    public List<RevenueByDay> getRevenueByMonth(String yearMonth) {
+        // Parse the year and month from the input string (format: YYYY-MM)
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+        YearMonth yearMonthObj = YearMonth.parse(yearMonth, formatter);
+
         // Calculate the start and end of the month
-        Timestamp startOfMonth = getStartOfMonth(month);
-        Timestamp endOfMonth = getEndOfMonth(month);
+        LocalDate startOfMonth = yearMonthObj.atDay(1); // First day of the month
+        LocalDate endOfMonth = yearMonthObj.atEndOfMonth(); // Last day of the month
+
+        // Convert to Timestamp for database query
+        Timestamp startOfMonthTimestamp = Timestamp.valueOf(startOfMonth.atStartOfDay());
+        Timestamp endOfMonthTimestamp = Timestamp.valueOf(endOfMonth.atTime(23, 59, 59));
 
         // Fetch all rentals within the given month
-        List<RentalEntity> rentals = rentalEntityRepository.findByStartDateBetweenOrderByStartDate(startOfMonth, endOfMonth);
+        List<RentalEntity> rentals = rentalEntityRepository.findByStartDateBetweenOrderByStartDate(startOfMonthTimestamp, endOfMonthTimestamp);
 
         // Group and aggregate by day (revenue calculation)
         Map<String, BigDecimal> revenueByDay = rentals.stream()
@@ -109,11 +119,11 @@ public class StatsServiceImpl implements StatsService {
 
     // Get faults number by each vehicle
     @Override
-    public Map<Vehicle, Integer> getFaultsByVehicle() {
+    public Map<String, Integer> getFaultsByVehicle() {
         return vehicleEntityRepository.findAll().stream()
                 .collect(Collectors.toMap(
-                        vehicle -> modelMapper.map(vehicle, Vehicle.class),
-                        vehicle -> vehicle.getFaults().size() // Assuming getFaults() returns a List
+                        vehicle -> vehicle.getModel(), // Use the vehicle model as the key
+                        vehicle -> vehicle.getFaults().size() // Number of faults
                 ));
     }
 

@@ -56,4 +56,26 @@ public class EmployeeServiceImpl extends CrudJpaService<EmployeeEntity, Integer>
         return getModelMapper().map(employeeEntity, Employee.class);
     }
 
+    @Override
+    public Employee updateEmployee(Integer id, EmployeeRequest request) {
+        EmployeeEntity employeeEntity = employeeEntityRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Employee not found"));
+
+        if (userEntityRepository.existsByUsername(request.getUsername())
+                && !employeeEntity.getUsername().equals(request.getUsername())) {
+            throw new IllegalArgumentException("Username already exists");
+        }
+
+        getModelMapper().map(request, employeeEntity);
+
+        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
+            employeeEntity.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        }
+
+        employeeEntity = employeeEntityRepository.saveAndFlush(employeeEntity);
+        getEntityManager().refresh(employeeEntity);
+
+        return getModelMapper().map(employeeEntity, Employee.class);
+    }
+
 }

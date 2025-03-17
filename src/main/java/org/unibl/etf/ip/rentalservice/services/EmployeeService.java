@@ -17,4 +17,7 @@ public interface EmployeeService extends CrudService<Integer> {
 
     // Insert a new employee
     Employee insertEmployee(EmployeeRequest request);
+
+    // Update an employee
+    Employee updateEmployee(Integer id, EmployeeRequest request);
 }

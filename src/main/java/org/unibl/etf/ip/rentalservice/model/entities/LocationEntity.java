@@ -17,10 +17,10 @@ public class LocationEntity implements BaseEntity<Integer> {
     @Column(name = "id", nullable = false)
     private Integer id;
     @Basic
-    @Column(name = "latitude", nullable = false, precision = 8)
+    @Column(name = "latitude", nullable = false, precision = 10, scale = 8)
     private BigDecimal latitude;
     @Basic
-    @Column(name = "longitude", nullable = false, precision = 8)
+    @Column(name = "longitude", nullable = false, precision = 11, scale = 8)
     private BigDecimal longitude;
     @OneToMany(mappedBy = "pickUpLocation")
     @JsonIgnore

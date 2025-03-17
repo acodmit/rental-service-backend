@@ -2,9 +2,6 @@ package org.unibl.etf.ip.rentalservice.model.requests;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.unibl.etf.ip.rentalservice.model.dto.Fault;
-import org.unibl.etf.ip.rentalservice.model.dto.Manufacturer;
-import org.unibl.etf.ip.rentalservice.model.dto.Rental;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -24,4 +21,5 @@ public class VehicleRequest {
     //private List<Fault> faults;
     //private List<Rental> rentals;
     private Integer manufacturerId;
+    private Integer locationId;
 }

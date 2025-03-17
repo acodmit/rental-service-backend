@@ -42,6 +42,9 @@ public class VehicleEntity implements BaseEntity<Integer> {
     @Basic
     @Column(name = "hourly_rate", nullable = false, precision = 10, scale = 2)
     private BigDecimal hourlyRate;
+    @ManyToOne
+    @JoinColumn(name = "location_id", referencedColumnName = "id", nullable = false)
+    private LocationEntity location;
     @JsonIgnore
     @OneToMany(mappedBy = "vehicle")
     private List<FaultEntity> faults;
