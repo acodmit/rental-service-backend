@@ -7,6 +7,7 @@ import java.util.List;
 @Data
 public class Location {
     private Integer id;
+    private String name;
     private BigDecimal latitude;
     private BigDecimal longitude;
     //private List<Rental> pickUpRentals;

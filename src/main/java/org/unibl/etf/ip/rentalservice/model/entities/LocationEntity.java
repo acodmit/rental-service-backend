@@ -17,6 +17,9 @@ public class LocationEntity implements BaseEntity<Integer> {
     @Column(name = "id", nullable = false)
     private Integer id;
     @Basic
+    @Column(name = "name", nullable = false, length = 255)
+    private String name;
+    @Basic
     @Column(name = "latitude", nullable = false, precision = 10, scale = 8)
     private BigDecimal latitude;
     @Basic

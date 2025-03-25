@@ -9,6 +9,7 @@ import java.util.List;
 
 @Data
 public class LocationRequest {
+    private String name;
     private BigDecimal latitude;
     private BigDecimal longitude;
     //private List<Rental> pickUpRentals;
